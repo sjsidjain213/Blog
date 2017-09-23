@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>Insert title here</title>
+<style>
+
+p {
+	font-family: "Arial Black", Gadget, sans-serif;
+	color: black;
+	font-size: 18px
+}
+h1{
+}
+#pagetitle{
+color:#fcac45
+
+}
+
+#title{
+font-family:"Arial Black", Gadget, sans-serif;
+color : black;
+font-size : 26px
+}
+#name{
+font-family:"Courier New", Courier, monospace;
+color : black;
+font-size : 14px
+}
+#content{
+font-family:"Lucida Console", Monaco, monospace;
+color : black;
+font-size : 18px
+}
+#heading {
+	background-color:  #464b51;
+}
+
+#operationHolder {
+	padding-top: 10px;
+}
+</style>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.4/angular.js"></script>
+<script src="http://angular-ui.github.com/bootstrap/ui-bootstrap-tpls-0.2.0.js"></script>
+<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script type="text/javascript">
+	var app = angular.module("BlogManagement", []);
+
+	//Controller Part
+	app.controller("BlogController", 
+	    				function($scope,$location,$http) {
+                        _refreshArticleData(); 
+						function _refreshArticleData() {
+							var aid = $location.search().aid;
+							location.href="http://localhost:10080/blog/Blog.html#?aid="+aid;  		
+                    	}
+});
+</script>
+</head>
+<body ng-app="BlogManagement" ng-controller="BlogController">
+</body>
+</html>

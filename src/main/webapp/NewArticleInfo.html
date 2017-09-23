@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>New Article</title>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.4/angular.js"></script>
+<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<style>
+
+p {
+	font-family: "Arial Black", Gadget, sans-serif;
+	color: black;
+	font-size: 18px
+}
+#title{
+font-family:Impact, Charcoal, sans-serif;
+color : black;
+font-size : 26px
+}
+#name{
+font-family:"Courier New", Courier, monospace;
+color : black;
+font-size : 14px
+}
+#content{
+font-family:"Comic Sans MS", cursive, sans-serif;
+color : black;
+font-size : 18px
+}
+#heading {
+	background-color: #ccc;
+}
+
+#operationHolder {
+	padding-top: 10px;
+}
+</style>
+
+<script type="text/javascript">
+	var app = angular.module("BlogManagement", []);
+
+	//Controller Part
+	app.controller(
+					"BlogController",
+					function($scope, $http) {
+						
+						$scope.newarticle = function(title,content) {
+					   if(!angular.isUndefined(title)&&!angular.isUndefined(content))	
+								{	
+						 $http({
+		                        method : 'POST',
+		                        url : '/blog/rest/articles/new/article',
+		                        	data : {
+		                         	title:title,
+		                         	content:content
+		                        	}   
+						 }).then(function successCallback(response) {
+		                    	if(response.data = true)
+		                    	{location.href="http://localhost:10080/blog/Home.html"
+		                    	}else{
+		                    		$scope.message = "something bad happened"
+		                    	}	
+		                    }, function errorCallback(response) {
+		                        console.log(response.statusText);
+		                    });}
+						 else {alert("select value")}
+						};
+
+						$scope.genre = ['Motivational','Historical','Technical'];
+
+						  // Selected genre
+						  $scope.selection = [];
+
+						  // Toggle selection for a given genre by name
+						  $scope.toggleSelection = function toggleSelection(genreName) {
+						    var idx = $scope.selection.indexOf(genreName);
+
+						    // Is currently selected
+						    if (idx > -1) {
+						      $scope.selection.splice(idx, 1);
+						    }
+
+						    // Is newly selected
+						    else {
+						      $scope.selection.push(genreName);
+						    }
+						    alert($scope.selection)
+						  };
+						
+						function _error(response) {
+							console.log(response.statusText);
+						}
+});
+</script>
+
+</head>
+<body ng-app="BlogManagement" ng-controller="BlogController">
+	<div class="row" id="heading">
+		<h1 align="center">ITT BLOGS</h1>
+	</div>
+<br>
+<div class="row">
+<div class="col-xs-2">
+</div>
+<div class="col-xs-8">
+<h3 align="center">Article Related Information</h3>
+<br>
+<p>Extra Genre Details for Article : <label ng-repeat="genreName in genre">
+  <input
+    type="checkbox" name="selectedgenre[]" value="{{genreName}}"
+    ng-checked="selection.indexOf(genreName) > -1"
+    ng-click="toggleSelection(genreName)"
+  >{{genreName}} <br>
+</label></p>
+
+<button type="button" class="btn btn-primary btn-block" ng-click="newarticle(title,content)">Submit</button>
+</div>
+<div class="col-xs-2">
+</div>
+</div>
+</body>
+</html>

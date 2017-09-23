@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>Insert title here</title>
+<script
+	src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.4/angular.js"></script>
+<link rel="stylesheet"
+	href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<style>
+
+p {
+	font-family: "Arial Black", Gadget, sans-serif;
+	color: black;
+	font-size: 18px
+}
+#title{
+font-family:Impact, Charcoal, sans-serif;
+color : black;
+font-size : 26px
+}
+#name{
+font-family:"Courier New", Courier, monospace;
+color : black;
+font-size : 14px
+}
+#content{
+font-family:"Comic Sans MS", cursive, sans-serif;
+color : black;
+font-size : 18px
+}
+#heading {
+	background-color: #ccc;
+}
+
+#operationHolder {
+	padding-top: 10px;
+}
+</style>
+<script type="text/javascript">
+	var app = angular.module("CountryManagement", []);
+
+	//Controller Part
+	app.controller(
+					"CountryController",
+					function($scope, $http) {
+
+						$scope.shelf = [ {	'name' : '=','id' : '='}, 
+							{'name' : '>','id' : '>'}, 
+							{'name' : '<','id' : '<'}, 
+							{'name' : '<>','id' : '<>'},
+							{'name' : '!>','id' : '!>'},
+							{'name' : 'IN','id' : 'in'},
+							{'name' : 'Or Greater','id' : 'orgreater'},
+							{'name':'Between','id':'between'}];
+						
+						 $scope.values = [ '1','2','3','4','5'];
+						$scope.comparisonValues = '1'
+						
+						$scope.valuestwo = ['1','2','3','4','5'];
+						$scope.comparisonValuesTwo = '1'
+							
+						/* Private Methods */
+						//HTTP GET- get all countries collection
+             		$scope.callOperation = function(operation) {
+							if (operation === 1) {
+								window.location = "http://localhost:10080/blog/Admin.html";
+							} else if (operation === 2) {
+								window.location = "http://localhost:10080/blog/Comparison.html";
+							} else if (operation === 3) {
+								window.location = "http://localhost:10080/blog/Logical.html";
+							}
+
+						}
+						
+                    $scope.called = function(aid)
+                    {
+                     location.href="http://localhost:10080/blog/Blog.html#?aid="+aid;
+                    }
+				    
+                    $scope.articles = []; 
+						_refreshArticleData();
+						function _refreshArticleData() {
+							$http({
+								method : 'GET',
+								url : '/blog/rest/articles/home'
+							}).then(function successCallback(response) {
+								$scope.articles = response.data;
+							}, function errorCallback(response) {
+							});
+						}
+						
+						$scope.editCountry = function(operation,value,valueTwo) {
+						 var x = operation.id;
+						 var y = value;
+						 var z = valueTwo
+		
+						 if(value>valueTwo){
+		                 alert("invalid input first value should be greater then second value")
+		                 return;
+						 }
+		if(!angular.isUndefined(value)&&!angular.isUndefined(operation))	
+								{	
+						 $http({
+		                        method : 'Get',
+		                        url : '/blog/rest/articles/'+x+'/'+y+'/'+z
+		                    }).then(function successCallback(response) {
+		                        $scope.articles = response.data;
+		                    }, function errorCallback(response) {
+		                        console.log(response.statusText);
+		                    });}
+						 else {alert("select value")}
+						};
+
+						function _error(response) {
+							console.log(response.statusText);
+						}
+});
+</script>
+
+</head>
+
+<body ng-app="CountryManagement" ng-controller="CountryController">
+	<div class="row" id="heading">
+		<h4 align="center"> <a href ="http://localhost:10080/blog/Admin.html" >Data Operations</a> <a href="http://localhost:10080/blog/NewUser.html">New User</a></h1>
+		<h2 align="center">Filters</h3>
+	</div>
+	<hr>
+	<hr>
+
+	<div class="row" id="buttonHolder">
+		<div class="col-xs-4">
+			<button type="button" class="btn btn-primary btn-block"
+				ng-click="callOperation(1)">Data Sum Up</button>
+		</div>
+		<div class="col-xs-4">
+			<button type="button" class="btn btn-primary btn-block"
+				ng-click="callOperation(2)">Filters</button>
+		</div>
+		<div class="col-xs-4">
+			<button type="button" class="btn btn-primary btn-block"
+				ng-click="callOperation(3)">User Details</button>
+		</div>
+	</div>
+
+	<div class="row" id="operationHolder">
+		<div class="col-xs-2"></div>
+		<div class="col-xs-6">
+			<p>
+				Rating <select ng-model="selectedValue"
+					ng-options="shelfs.name for shelfs in shelf"></select> 
+					value1 :<select ng-model="comparisonValues" ng-options="value for value in values"></select>
+					value2 :<select ng-model="comparisonValuesTwo" ng-options="value for value in valuestwo"></select>
+			</p>
+		</div>
+		<div class="col-xs-2">
+			<button type="button" class="btn btn-default btn-sm btn-block" 
+			ng-click="editCountry(selectedValue,comparisonValues,comparisonValuesTwo)">Submit
+				Operation</button>
+			<div class="col-xs-2"></div>
+		</div>
+	</div>
+	<hr>
+	
+	
+	<div class="row">
+		<div class="col-xs-2"></div>
+		<div class="col-xs-8">
+			<table class="table table-hover">
+				<tr ng-repeat="article in articles">
+					 <div>
+					 <p>{{article.title}}</p>
+					 <p>{{article.content}}</p>
+					 </div>
+					 <td><p>{{article.title}}</p></td>
+					 <td><p>{{article.content}}</p><td>
+				</tr>
+			</table>
+		</div>
+		<div class="col-xs-2"></div>
+	</div>
+	
+</body>
+</html>

@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>New Article</title>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.4/angular.js"></script>
+<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<style>
+
+p {
+	font-family: "Arial Black", Gadget, sans-serif;
+	color: black;
+	font-size: 18px
+}
+#title{
+font-family:Impact, Charcoal, sans-serif;
+color : black;
+font-size : 26px
+}
+#name{
+font-family:"Courier New", Courier, monospace;
+color : black;
+font-size : 14px
+}
+#content{
+font-family:"Comic Sans MS", cursive, sans-serif;
+color : black;
+font-size : 18px
+}
+#heading {
+	background-color: #ccc;
+}
+#navbar{
+    background-color: #fcac45;
+    border-color: #F87431;
+    margin-bottom: 0px;
+    border-bottom-width: 5px;
+    border-top-width: 0px;
+    color: #FFFFFF;
+}
+
+.navbar-default .navbar-nav > li > a:hover, .navbar-default .navbar-nav > li > a:focus {
+color: #000;  /*Sets the text hover color on navbar*/
+}
+
+#navbarbutton
+{
+    background-color: #fcac45;
+}
+#operationHolder {
+	padding-top: 10px;
+}
+</style>
+
+<script type="text/javascript">
+	var app = angular.module("BlogManagement", []);
+
+	//Controller Part
+	app.controller(
+					"BlogController",
+					function($scope, $http) {
+						
+					   $scope.newarticle = function(title,content) {
+					 if(!angular.isUndefined(title)&&!angular.isUndefined(content))	
+					  {	
+						 $http({
+		                        method : 'POST',
+		                        url : '/blog/rest/articles/new/article',
+		                        	data : {
+		                         	title:title,
+		                         	content:content,
+		                            genre: $scope.selection
+		                        	}   
+						 }).then(function successCallback(response) {
+		                    	if(response.data = true)
+		                    	{location.href="http://localhost:10080/blog/Home.html"
+		                    	}else{
+		                    		$scope.message = "something bad happened"
+		                    	}	
+		                    }, function errorCallback(response) {
+		                        console.log(response.statusText);
+		                    });}
+						 else {alert("select value")}
+						};
+						$scope.genre = ['Motivational','Historical','Technical'];
+
+						  // Selected genre
+						  $scope.selection = [];
+
+						  // Toggle selection for a given genre by name
+						  $scope.toggleSelection = function toggleSelection(genreName) {
+						    var idx = $scope.selection.indexOf(genreName);
+
+						    // Is currently selected
+						    if (idx > -1) {
+						      $scope.selection.splice(idx, 1);
+						    }
+
+						    // Is newly selected
+						    else {
+						      $scope.selection.push(genreName);
+						    }
+						  };
+							_sessionValidation();
+							function _sessionValidation()
+							{
+								 $http({
+				                        method : 'Get',
+				                        url : '/blog/rest/validation/session'
+				                    }).then(function successCallback(response) {
+	                                     if(response.data==true)
+	                                 	{
+	                         	 $scope.profile = 2;
+	                 		    $scope.logintogglebutton = "Signout"
+	                                 	}else{
+	                            $scope.profile = 1;
+	                			$scope.logintogglebutton = "Login/Signup"
+	                				location.href="http://localhost:10080/blog/Error.html";
+	                   		             }
+				                    	$scope.articles = response.data;
+				                    }, function errorCallback(response) {
+				                        console.log(response.statusText);
+				                    });
+							}
+							$scope.profile = 1;
+							$scope.loginValidation = function(){
+									$http({
+										method : 'GET',
+										url : '/blog/rest/validation/session'
+									}).then(function successCallback(response) {
+										if(response.data==true)
+											{
+											$http({
+												method : 'GET',
+												url : '/blog/rest/validation/logout'
+											}).then(function successCallback(response) {
+	      							location.href="http://localhost:10080/blog/Home.html";
+											}, function errorCallback(response) {
+											});			
+											}
+										else{
+								 	  location.href="http://localhost:10080/blog/Login.html";
+										}
+									}, function errorCallback(response) {
+									});
+							}
+						function _error(response) {
+							console.log(response.statusText);
+						}
+});
+</script>
+
+</head>
+<body ng-app="BlogManagement" ng-controller="BlogController">
+ <nav class="navbar navbar-default " id="navbar">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+            <button type="button" data-target="#navbarCollapse" data-toggle="collapse" class="navbar-toggle" id="navbarbutton">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="#" class="navbar-brand">ITT Blog</a>
+        </div>
+        <div id="navbarCollapse" class="collapse navbar-collapse">
+            <ul class="nav navbar-nav">
+                <li><a href="http://localhost:10080/blog/Home.html">Home</a></li>
+                <li><a ng-click="newArticle()">New Article</a></li>
+                <li><a href="http://localhost:10080/blog/Profile.html" ng-hide="profile==1">Profile</a></li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+              <li><a ng-model="logintogglebutton" ng-click="loginValidation()">{{logintogglebutton}}</a></li>
+            </ul>
+        </div>
+    </nav>
+	<br>
+<div class="row">
+<div class="col-xs-2">
+</div>
+<div class="col-xs-8">
+<div class="form-group">
+  <label for="usr">Title</label><br>
+  <input type="text" class="form-control" id="usr" ng-model="title">
+</div>
+<p>Extra Genre Details : <label ng-repeat="genreName in genre">
+  <input
+    type="checkbox" name="selectedgenre[]" value="{{genreName}}"
+    ng-checked="selection.indexOf(genreName) > -1"
+    ng-click="toggleSelection(genreName)"
+  >{{genreName}} <br>
+</label></p>
+<div class="form-group">
+  <label for="content">Content:</label>
+  <textarea class="form-control" rows="13" id="content" ng-model="content"></textarea>
+</div>
+<button type="button" class="btn btn-primary btn-block" ng-click="newarticle(title,content)">Submit</button>
+</div>
+<div class="col-xs-2">
+</div>
+</div>
+</body>
+</html>

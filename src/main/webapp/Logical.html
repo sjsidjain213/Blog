@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>Insert title here</title>
+<script
+	src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.4/angular.js"></script>
+<link rel="stylesheet"
+	href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<style>
+.blue-button {
+	background: #25A6E1;
+	filter: progid: DXImageTransform.Microsoft.gradient( startColorstr='#25A6E1',
+		endColorstr='#188BC0', GradientType=0);
+	padding: 3px 5px;
+	color: #fff;
+	font-family: 'Helvetica Neue', sans-serif;
+	font-size: 12px;
+	border-radius: 2px;
+	-moz-border-radius: 2px;
+	-webkit-border-radius: 4px;
+	border: 1px solid #1A87B9
+}
+
+.red-button {
+	background: #CD5C5C;
+	padding: 3px 5px;
+	color: #fff;
+	font-family: 'Helvetica Neue', sans-serif;
+	font-size: 12px;
+	border-radius: 2px;
+	-moz-border-radius: 2px;
+	-webkit-border-radius: 4px;
+	border: 1px solid #CD5C5C
+}
+
+table {
+	font-family: "Helvetica Neue", Helvetica, sans-serif;
+	width: 50%;
+}
+
+caption {
+	text-align: left;
+	color: silver;
+	font-weight: bold;
+	text-transform: uppercase;
+	padding: 5px;
+}
+
+th {
+	background: SteelBlue;
+	color: white;
+}
+
+tbody tr:nth-child(even) {
+	background: WhiteSmoke;
+}
+
+tbody tr td:nth-child(2) {
+	text-align: center;
+}
+
+tbody tr td:nth-child(3), tbody tr td:nth-child(4) {
+	text-align: center;
+	font-family: monospace;
+}
+
+tfoot {
+	background: SeaGreen;
+	color: white;
+	text-align: right;
+}
+
+tfoot tr th:last-child {
+	font-family: monospace;
+}
+
+td, th {
+	border: 1px solid gray;
+	width: 25%;
+	text-align: left;
+	padding: 5px 10px;
+}
+p{
+font-family:"Arial Black", Gadget, sans-serif;color: black;font-size:18px}
+#heading {
+	background-color: #ccc;
+}
+#operationHolder{
+padding-top:10px;
+}
+</style>
+<script type="text/javascript">
+	var app = angular.module("CountryManagement", []);
+
+	//Controller Part
+	app.controller("CountryController", function($scope, $http) {
+		$scope.countries = [];
+		$scope.countryForm = {
+			id : -1,
+			countryName : "",
+			population : ""
+		};
+
+		/*                _refreshCountryData();
+		               _refreshArticleData();
+		 */
+		//HTTP POST/PUT methods for add/edit country 
+		// with the help of id, we are going to find out whether it is put or post operation
+		$scope.submitCountry = function() {
+			var method = "";
+			var url = "";
+			if ($scope.countryForm.id == -1) {
+				//Id is absent in form data, it is create new country operation
+				method = "POST";
+				url = '/blog/rest/countries';
+			} else {
+				//Id is present in form data, it is edit country operation
+				method = "PUT";
+				url = 'rest/countries';
+			}
+			$http({
+				method : method,
+				url : url,
+				data : angular.toJson($scope.countryForm),
+				headers : {
+					'Content-Type' : 'application/json'
+				}
+			}).then(_success, _error);
+		};
+		/* Private Methods */
+		//HTTP GET- get all countries collection
+		function _refreshCountryData() {
+			$http({
+				method : 'GET',
+				url : '/blog/rest/countries'
+			}).then(function successCallback(response) {
+				$scope.countries = response.data;
+			}, function errorCallback(response) {
+				console.log(response.statusText);
+			});
+		}
+
+		function _refreshArticleData() {
+			$http({
+				method : 'GET',
+				url : '/blog/rest/articles'
+			}).then(function successCallback(response) {
+				$scope.articles = response.data;
+			}, function errorCallback(response) {
+				console.log(response.statusText);
+			});
+		}
+ 
+		$scope.callOperation = function(operation)
+		{if(operation===1){window.location = "http://localhost:10080/blog/Admin.html";}
+			else if(operation===2){ window.location = "http://localhost:10080/blog/Comparison.html";}
+			else if(operation===3){ window.location = "http://localhost:10080/blog/Logical.html";}
+		}
+		
+		$scope.shelf = [ {	'name' : 'Right Join(All Users)','id' : 'allusers'}, 
+			{'name' : 'Inner Join(Users with article)','id' : 'userswitharticle'}, 
+			{'name' : 'All Data(Union all)', 'id':'alldata'}];
+
+		$scope.users = []
+
+		$scope.submitOperation = function(operation) {
+			 var x = operation.id;
+		
+			 if(!angular.isUndefined(operation))	
+					{	
+			 $http({
+                   method : 'Get',
+                   url : '/blog/rest/users/'+x
+               }).then(function successCallback(response) {
+                 $scope.users = response.data;
+               }, function errorCallback(response) {
+                   console.log(response.statusText);
+               });}
+			 else {alert("select value")}
+			};
+		
+	});
+</script>
+
+</head>
+
+<body ng-app="CountryManagement" ng-controller="CountryController">
+	<div class="row" id="heading">
+	<h4 align="center"> <a href ="http://localhost:10080/blog/Admin.html" >Data Operations</a> <a href="http://localhost:10080/blog/NewUser.html">New User</a></h4>
+<h2 align="center">User Details</h2>
+</div>
+	<hr>
+	<hr>
+
+	<div class="row" id="buttonHolder">
+		<div class="col-xs-4">
+				<button type="button" class="btn btn-primary btn-block" ng-click="callOperation(1)" >Data Sum Up</button>
+		</div>
+		<div class="col-xs-4">		
+		        <button type="button" class="btn btn-primary btn-block" ng-click="callOperation(2)">Filters</button>
+		</div>
+		<div class="col-xs-4">
+				<button type="button" class="btn btn-primary btn-block" ng-click="callOperation(3)">User Details</button>
+		</div>
+	</div>
+
+	<div class="row" id="operationHolder">
+		<div class="col-xs-2"></div>
+		<div class="col-xs-6">
+			<p>Select Operation .<select ng-model="selectedValue"
+				ng-options="shelfs.name for shelfs in shelf"></select>
+			
+				</p>
+		</div>
+		<div class="col-xs-2">
+			<button type="button" class="btn btn-default btn-sm btn-block"
+				ng-click="submitOperation(selectedValue)">Submit Operation</button>
+			<div class="col-xs-2"></div>
+		</div>
+		</div>
+		<hr>
+	<div class="row">
+		<div class="col-xs-2"></div>
+		<div class="col-xs-8">
+			<table class="table table-hover">
+				<tr>
+					<th>Username</th>
+					<th>Name</th>
+					<th>No. of Article</th>
+					<th>Avg Rating</th>
+				</tr>
+				<tr ng-repeat="user in users">
+					<td>{{ user.username }}</td>
+					<td>{{ user.name }}</td>
+					<td>{{ user.noofarticle }}</td>
+					<td>{{ user.avg }}</td>
+					
+				</tr>
+			</table>
+		</div>
+		<div class="col-xs-2"></div>
+	</div>
+</body>
+</html>
